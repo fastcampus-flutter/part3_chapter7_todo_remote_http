@@ -104,7 +104,10 @@ class _TodoClient implements TodoClient {
   Future<void> removeTodo(int id) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{r'Content-Type': 'text/plain'};
+    final _headers = <String, dynamic>{
+      r'Content-Type': 'text/plain',
+      r'Content-Length': 0,
+    };
     _headers.removeWhere((k, v) => v == null);
     final Map<String, dynamic>? _data = null;
     await _dio.fetch<void>(_setStreamType<void>(Options(

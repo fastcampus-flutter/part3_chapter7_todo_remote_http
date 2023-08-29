@@ -29,6 +29,7 @@ abstract class TodoClient {
   @DELETE('/todos/{id}')
   @Headers(<String, dynamic>{
     "Content-Type": "text/plain",
+    "Content-Length": 0,
   })
   Future<void> removeTodo(@Path("id") int id);
 }
