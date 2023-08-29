@@ -2,6 +2,8 @@ import 'package:fast_app_base/common/cli_common.dart';
 import 'package:fast_app_base/common/util/async/flutter_async.dart';
 import 'package:fast_app_base/data/memory/todo_status.dart';
 import 'package:fast_app_base/data/memory/vo_todo.dart';
+import 'package:fast_app_base/data/remote/result/api_error.dart';
+import 'package:fast_app_base/data/simple_result.dart';
 import 'package:fast_app_base/screen/dialog/d_confirm.dart';
 import 'package:fast_app_base/screen/dialog/d_message.dart';
 import 'package:fast_app_base/screen/main/write/d_write_todo.dart';
@@ -51,11 +53,11 @@ class TodoData extends GetxController {
   }
 
   void changeTodoStatus(Todo todo) async {
-     TodoStatus nextStatus = todo.status;
+    TodoStatus nextStatus = todo.status;
     switch (todo.status) {
       case TodoStatus.complete:
         final result = await ConfirmDialog('다시 처음 상태로 변경하시겠어요?').show();
-        if(result?.isFailure == true){
+        if (result?.isFailure == true) {
           return;
         }
         result?.runIfSuccess((data) {
@@ -68,31 +70,54 @@ class TodoData extends GetxController {
       case TodoStatus.unknown:
         return;
     }
-
-    final result = await todoRepository.updateTodo(todo..status = nextStatus); //객체 안의 status 바꿔서 update요청
-    result.runIfSuccess((data) => updateTodo(todo));
-    result.runIfFailure((error) => MessageDialog(error.message).show());
+    final Todo todoForSave = Todo(
+        id: todo.id,
+        createdTime: todo.createdTime,
+        title: todo.title,
+        dueDate: todo.dueDate,
+        status: nextStatus);
+    final responseResult = await todoRepository.updateTodo(todoForSave); //객체 안의 status 바꿔서 update요청
+    processResponseResult(responseResult, todoForSave);
   }
 
   editTodo(Todo todo) async {
     final result = await WriteTodoBottomSheet(todoForEdit: todo).show();
-    result?.runIfSuccess((data) {
-      todo.modifyTime = DateTime.now();
-      todo.title = data.title;
-      todo.dueDate = data.dueDate;
+    final Todo todoForSave = Todo(
+        id: todo.id,
+        createdTime: todo.createdTime,
+        title: todo.title,
+        dueDate: todo.dueDate,
+        status: todo.status);
+    
+    result?.runIfSuccess((data) async {
+      todoForSave.modifyTime = DateTime.now();
+      todoForSave.title = data.title;
+      todoForSave.dueDate = data.dueDate;
+
+      final responseResult =
+          await todoRepository.updateTodo(todoForSave); //객체 안의 status 바꿔서 update요청
+      processResponseResult(responseResult, todoForSave);
     });
-    updateTodo(todo);
   }
 
-  void updateTodo(Todo todo) async{
-
-    todoList.refresh();
+  void processResponseResult(SimpleResult<void, ApiError> result, Todo updatedTodo) {
+    result.runIfSuccess((data) => updateTodo(updatedTodo));
+    result.runIfFailure((error) => MessageDialog(error.message).show());
   }
 
   void removeTodo(Todo todo) {
     todoList.remove(todo);
     todoRepository.removeTodo(todo.id);
-    //LocalDB.removeTodo(todo.id);
+  }
+
+  updateTodo(Todo updatedTodo) {
+    final todo = todoList.firstWhere((element) => element.id == updatedTodo.id);
+    todo
+      ..title = updatedTodo.title
+      ..status = updatedTodo.status
+      ..dueDate = updatedTodo.dueDate;
+
+    todoList.refresh();
   }
 }
 
