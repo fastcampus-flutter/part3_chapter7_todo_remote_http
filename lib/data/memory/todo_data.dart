@@ -51,20 +51,27 @@ class TodoData extends GetxController {
   }
 
   void changeTodoStatus(Todo todo) async {
+     TodoStatus nextStatus = todo.status;
     switch (todo.status) {
       case TodoStatus.complete:
         final result = await ConfirmDialog('다시 처음 상태로 변경하시겠어요?').show();
+        if(result?.isFailure == true){
+          return;
+        }
         result?.runIfSuccess((data) {
-          todo.status = TodoStatus.incomplete;
+          nextStatus = TodoStatus.incomplete;
         });
       case TodoStatus.incomplete:
-        todo.status = TodoStatus.ongoing;
+        nextStatus = TodoStatus.ongoing;
       case TodoStatus.ongoing:
-        todo.status = TodoStatus.complete;
+        nextStatus = TodoStatus.complete;
       case TodoStatus.unknown:
         return;
     }
-    updateTodo(todo);
+
+    final result = await todoRepository.updateTodo(todo..status = nextStatus); //객체 안의 status 바꿔서 update요청
+    result.runIfSuccess((data) => updateTodo(todo));
+    result.runIfFailure((error) => MessageDialog(error.message).show());
   }
 
   editTodo(Todo todo) async {
@@ -77,8 +84,8 @@ class TodoData extends GetxController {
     updateTodo(todo);
   }
 
-  void updateTodo(Todo todo) {
-    todoRepository.updateTodo(todo);
+  void updateTodo(Todo todo) async{
+
     todoList.refresh();
   }
 

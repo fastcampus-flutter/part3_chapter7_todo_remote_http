@@ -9,6 +9,7 @@ import '../todo_repository.dart';
 
 ///Remote DB
 class TodoApi implements TodoRepository<ApiError> {
+  //final client = TodoClient(Dio()..interceptors.add(DioJsonResponseConverter())); //서버에서 Content-Type : application/json 헤더를 주지 않는 경우
   final client = TodoClient(Dio());
 
   TodoApi._();
@@ -34,7 +35,7 @@ class TodoApi implements TodoRepository<ApiError> {
   @override
   Future<SimpleResult<void, ApiError>> updateTodo(Todo todo) async {
     return tryRequest(() async {
-      await client.updateTodo(todo);
+      await client.updateTodo(todo.id, todo);
       return SimpleResult.success();
     });
   }

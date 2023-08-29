@@ -7,30 +7,28 @@ import 'package:dio/dio.dart' hide Headers;
 import 'package:fast_app_base/data/memory/vo_todo.dart';
 import 'package:retrofit/retrofit.dart';
 
-import 'dio/dio_json_response_converter.dart';
 
 part 'todo_client.g.dart';
 
 @RestApi()
 abstract class TodoClient {
   factory TodoClient(Dio dio, {String? baseUrl}) {
-    dio.interceptors.add(DioJsonResponseConverter());
     return _TodoClient(dio,
         baseUrl: Platform.isAndroid ? 'http://10.0.2.2:8080/' : 'http://localhost:8080/');
   }
 
-  @GET('/todo')
+  @GET('/todos')
   Future<List<Todo>> getTodoList();
 
-  @POST('/todo')
+  @POST('/todos')
   Future<void> addTodo(@Body() Todo todo);
 
-  @PUT('/todo')
-  Future<void> updateTodo(@Body() Todo todo);
+  @PUT('/todos/{id}')
+  Future<void> updateTodo(@Path("id") int id, @Body() Todo todo);
 
-  @DELETE('/todo')
+  @DELETE('/todos/{id}')
   @Headers(<String, dynamic>{
     "Content-Type": "text/plain",
   })
-  Future<void> removeTodo(@Body() int todoId);
+  Future<void> removeTodo(@Path("id") int id);
 }

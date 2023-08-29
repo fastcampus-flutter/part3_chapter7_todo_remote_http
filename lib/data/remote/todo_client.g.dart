@@ -32,7 +32,7 @@ class _TodoClient implements TodoClient {
     )
             .compose(
               _dio.options,
-              '/todo',
+              '/todos',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -61,7 +61,7 @@ class _TodoClient implements TodoClient {
     )
         .compose(
           _dio.options,
-          '/todo',
+          '/todos',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -73,7 +73,10 @@ class _TodoClient implements TodoClient {
   }
 
   @override
-  Future<void> updateTodo(Todo todo) async {
+  Future<void> updateTodo(
+    int id,
+    Todo todo,
+  ) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -86,7 +89,7 @@ class _TodoClient implements TodoClient {
     )
         .compose(
           _dio.options,
-          '/todo',
+          '/todos/${id}',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -98,12 +101,12 @@ class _TodoClient implements TodoClient {
   }
 
   @override
-  Future<void> removeTodo(int todoId) async {
+  Future<void> removeTodo(int id) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{r'Content-Type': 'text/plain'};
     _headers.removeWhere((k, v) => v == null);
-    final _data = todoId;
+    final Map<String, dynamic>? _data = null;
     await _dio.fetch<void>(_setStreamType<void>(Options(
       method: 'DELETE',
       headers: _headers,
@@ -112,7 +115,7 @@ class _TodoClient implements TodoClient {
     )
         .compose(
           _dio.options,
-          '/todo',
+          '/todos/${id}',
           queryParameters: queryParameters,
           data: _data,
         )
