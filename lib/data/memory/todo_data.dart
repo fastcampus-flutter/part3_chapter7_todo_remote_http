@@ -10,18 +10,20 @@ import 'package:fast_app_base/screen/main/write/d_write_todo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../local/local_db.dart';
 import '../remote/todo_api.dart';
 
 class TodoData extends GetxController {
   final RxList<Todo> todoList = <Todo>[].obs;
+  final RxBool isLoaded = false.obs;
 
   final todoRepository = TodoApi.instance;
-
-  //final TodoRepository todoRepository = LocalDB.instance;
+  //final todoRepository = LocalDB.instance;
 
   @override
   void onInit() async {
     final remoteTodoList = await todoRepository.getTodoList();
+    isLoaded.value = true;
     remoteTodoList.runIfSuccess((data) {
       todoList.addAll(data);
     });
@@ -39,7 +41,7 @@ class TodoData extends GetxController {
 
   void addTodo(BuildContext context) async {
     final result = await WriteTodoBottomSheet().show();
-    result?.runIfSuccess((data) {
+    result?.runIfSuccess((data) async{
       final newTodo = Todo(
         id: newId,
         title: data.title,
@@ -47,8 +49,17 @@ class TodoData extends GetxController {
         createdTime: DateTime.now(),
         status: TodoStatus.incomplete,
       );
-      todoList.add(newTodo);
-      todoRepository.addTodo(newTodo);
+     final requestResult = await todoRepository.addTodo(newTodo);
+     requestResult.runIfSuccess((data) => todoList.add(newTodo));
+     requestResult.runIfFailure((error) {
+       switch(error.networkErrorType){
+
+         case NetworkErrorType.networkConnectionError:
+           //재시도를 3번
+         case NetworkErrorType.serviceError:
+           MessageDialog(error.message).show();
+       }
+     });
     });
   }
 
@@ -88,14 +99,13 @@ class TodoData extends GetxController {
         title: todo.title,
         dueDate: todo.dueDate,
         status: todo.status);
-    
+
     result?.runIfSuccess((data) async {
       todoForSave.modifyTime = DateTime.now();
       todoForSave.title = data.title;
       todoForSave.dueDate = data.dueDate;
 
-      final responseResult =
-          await todoRepository.updateTodo(todoForSave); //객체 안의 status 바꿔서 update요청
+      final responseResult = await todoRepository.updateTodo(todoForSave);
       processResponseResult(responseResult, todoForSave);
     });
   }

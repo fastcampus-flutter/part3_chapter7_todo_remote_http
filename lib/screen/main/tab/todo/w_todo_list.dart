@@ -16,7 +16,8 @@ class _TodoListState extends State<TodoList> with TodoDataProvider {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => todoData.todoList.isEmpty
+      () => !todoData.isLoaded.value ? const Center(child: CircularProgressIndicator(),)
+          : todoData.todoList.isEmpty
           ? '할일을 작성해보세요'.text.size(30).makeCentered()
           : SingleChildScrollView(
               child: Column(

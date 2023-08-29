@@ -1,6 +1,8 @@
 import 'package:fast_app_base/data/local/collection/todo_db_model.dart';
 import 'package:fast_app_base/data/memory/todo_status.dart';
 import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 class Todo {
   final int id;
