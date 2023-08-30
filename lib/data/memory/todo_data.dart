@@ -10,7 +10,6 @@ import 'package:fast_app_base/screen/main/write/d_write_todo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../local/local_db.dart';
 import '../remote/todo_api.dart';
 
 class TodoData extends GetxController {

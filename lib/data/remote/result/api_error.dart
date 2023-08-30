@@ -21,7 +21,7 @@ class ApiError {
     this.statusCode,
     this.isApplicationError = false,
     required this.message,
-    this.networkErrorType = NetworkErrorType.serviceError;
+    this.networkErrorType = NetworkErrorType.serviceError,
   });
 
   static createErrorResult(e) {
