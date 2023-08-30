@@ -80,24 +80,14 @@ class TodoData extends GetxController {
       case TodoStatus.unknown:
         return;
     }
-    final Todo todoForSave = Todo(
-        id: todo.id,
-        createdTime: todo.createdTime,
-        title: todo.title,
-        dueDate: todo.dueDate,
-        status: nextStatus);
+    final Todo todoForSave = todo.copyWith(status: nextStatus);
     final responseResult = await todoRepository.updateTodo(todoForSave); //객체 안의 status 바꿔서 update요청
     processResponseResult(responseResult, todoForSave);
   }
 
   editTodo(Todo todo) async {
     final result = await WriteTodoBottomSheet(todoForEdit: todo).show();
-    final Todo todoForSave = Todo(
-        id: todo.id,
-        createdTime: todo.createdTime,
-        title: todo.title,
-        dueDate: todo.dueDate,
-        status: todo.status);
+    final Todo todoForSave = todo.copyWith();
 
     result?.runIfSuccess((data) async {
       todoForSave.modifyTime = DateTime.now();

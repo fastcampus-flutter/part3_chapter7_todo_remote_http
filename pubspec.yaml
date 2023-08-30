@@ -70,7 +70,6 @@ dependencies:
   #network
   dio: ^5.3.2
   retrofit: ^4.0.1
-  freezed: ^2.3.4
   freezed_annotation: ^2.2.0
   json_annotation: ^4.8.0
   rive: ^0.11.11
@@ -89,6 +88,7 @@ dev_dependencies:
   retrofit_generator: 7.0.8
   build_runner: 2.3.3
   json_serializable: ^6.6.1
+  freezed: ^2.3.4
   isar_generator: 3.1.0+1
   mock_web_server: ^5.0.0-nullsafety.1
   flutter_oss_licenses: ^2.0.1
